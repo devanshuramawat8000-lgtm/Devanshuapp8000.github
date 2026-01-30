@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sky Jump Adventure</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(#87ceeb, #ffffff);
+      font-family: Arial, sans-serif;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    h1 {
+      margin: 10px;
+      color: #034;
+    }
+
+    #game {
+      width: 360px;
+      height: 520px;
+      margin: auto;
+      background: linear-gradient(#6ec6ff, #e0f7ff);
+      border-radius: 20px;
+      border: 3px solid #0288d1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #player {
+      width: 30px;
+      height: 30px;
+      background: radial-gradient(circle, #ffeb3b, #fbc02d);
+      border-radius: 50%;
+      position: absolute;
+      bottom: 10px;
+      left: 165px;
+    }
+
+    .platform {
+      width: 80px;
+      height: 12px;
+      background: linear-gradient(#4caf50, #2e7d32);
+      border-radius: 10px;
+      position: absolute;
+    }
+
+    #message {
+      font-size: 22px;
+      color: #003;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 10px;
+      background: #0288d1;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>☁️ Sky Jump Adventure</h1>
+
+<div id="game">
+  <div id="player"></div>
+</div>
+
+<div id="message">Tap Left / Right to Move</div>
+<button onclick="restart()">Restart</button>
+
+<script>
+  const game = document.getElementById("game");
+  const player = document.getElementById("player");
+  const message = document.getElementById("message");
+
+  let px = 165;
+  let py = 480;
+  let vy = -8;
+  let gravity = 0.4;
+  let gameEnded = false;
+
+  const platforms = [
+    { x: 140, y: 480 },
+    { x: 60, y: 400 },
+    { x: 220, y: 320 },
+    { x: 80, y: 240 },
+    { x: 200, y: 160 },
+    { x: 140, y: 80 } // winning platform
+  ];
+
+  platforms.forEach(p => {
+    const el = document.createElement("div");
+    el.className = "platform";
+    el.style.left = p.x + "px";
+    el.style.top = p.y + "px";
+    game.appendChild(el);
+    p.el = el;
+  });
+
+  game.addEventListener("touchstart", e => {
+    const x = e.touches[0].clientX;
+    const rect = game.getBoundingClientRect();
+    if (x < rect.left + rect.width / 2) px -= 30;
+    else px += 30;
+  });
+
+  function loop() {
+    if (gameEnded) return;
+
+    vy += gravity;
+    py += vy;
+
+    platforms.forEach((p, i) => {
+      if (
+        py + 30 > p.y &&
+        py + 30 < p.y + 12 &&
+        px + 30 > p.x &&
+        px < p.x + 80 &&
+        vy > 0
+      ) {
+        vy = -8;
+
+        if (i === platforms.length - 1) {
+          message.textContent = "🎉 YOU WIN!";
+          gameEnded = true;
+        }
+      }
+    });
+
+    if (py > 520) {
+      message.textContent = "💥 GAME OVER";
+      gameEnded = true;
+    }
+
+    player.style.left = px + "px";
+    player.style.top = py + "px";
+
+    requestAnimationFrame(loop);
+  }
+
+  function restart() {
+    location.reload();
+  }
+
+  loop();
+</script>
+
+</body>
+                   </html>
